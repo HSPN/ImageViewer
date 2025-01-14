@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
     </Filter>
+    <Filter Include="libjpeg">
+      <UniqueIdentifier>{b3724f06-242e-4220-951b-c87f36317269}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -35,10 +38,81 @@
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="libjpeg\jconfig.h">
+      <Filter>libjpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="libjpeg\jconfigint.h">
+      <Filter>libjpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="libjpeg\jdmainct.h">
+      <Filter>libjpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="libjpeg\jdmaster.h">
+      <Filter>libjpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="libjpeg\jdmerge.h">
+      <Filter>libjpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="libjpeg\jdsample.h">
+      <Filter>libjpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="libjpeg\jerror.h">
+      <Filter>libjpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="libjpeg\jinclude.h">
+      <Filter>libjpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="libjpeg\jlossls.h">
+      <Filter>libjpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="libjpeg\jmemsys.h">
+      <Filter>libjpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="libjpeg\jmorecfg.h">
+      <Filter>libjpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="libjpeg\jpeg_nbits.h">
+      <Filter>libjpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="libjpeg\jpegapicomp.h">
+      <Filter>libjpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="libjpeg\jpegint.h">
+      <Filter>libjpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="libjpeg\jpeglib.h">
+      <Filter>libjpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="libjpeg\jsamplecomp.h">
+      <Filter>libjpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="libjpeg\jsimd.h">
+      <Filter>libjpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="libjpeg\jsimddct.h">
+      <Filter>libjpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="libjpeg\jversion.h">
+      <Filter>libjpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="libjpeg\tjutil.h">
+      <Filter>libjpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="libjpeg\transupp.h">
+      <Filter>libjpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="libjpeg\turbojpeg.h">
+      <Filter>libjpeg</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="main.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
