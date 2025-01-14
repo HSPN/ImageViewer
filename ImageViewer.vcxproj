@@ -110,11 +110,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ImgWnd.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainWnd.cpp" />
     <ClCompile Include="stdafx.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ImgWnd.h" />
     <ClInclude Include="libjpeg\jconfig.h" />
     <ClInclude Include="libjpeg\jconfigint.h" />
     <ClInclude Include="libjpeg\jdmainct.h" />
@@ -145,6 +147,7 @@
     <ResourceCompile Include="resource.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="bitmap1.bmp" />
     <Image Include="main.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

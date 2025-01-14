@@ -11,6 +11,7 @@
 #define IDC_ACCEL                       109
 #define IDR_MAINFRAME                   128
 #define IDR_MENU1                       132
+#define IDB_BITMAP1                     134
 #define IDM_OPEN                        32773
 #define IDM_CLOSE                       32774
 
@@ -19,7 +20,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        134
+#define _APS_NEXT_RESOURCE_VALUE        135
 #define _APS_NEXT_COMMAND_VALUE         32775
 #define _APS_NEXT_CONTROL_VALUE         1002
 #define _APS_NEXT_SYMED_VALUE           110

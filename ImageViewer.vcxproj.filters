@@ -27,6 +27,9 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ImgWnd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainWnd.h">
@@ -104,6 +107,9 @@
     <ClInclude Include="libjpeg\turbojpeg.h">
       <Filter>libjpeg</Filter>
     </ClInclude>
+    <ClInclude Include="ImgWnd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc">
@@ -112,6 +118,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="main.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="bitmap1.bmp">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
