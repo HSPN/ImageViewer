@@ -105,6 +105,9 @@
     <ClCompile>
       <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
+    <Link>
+      <AdditionalDependencies>libjpeg/jpeg-static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -112,6 +115,28 @@
     <ClCompile Include="stdafx.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="libjpeg\jconfig.h" />
+    <ClInclude Include="libjpeg\jconfigint.h" />
+    <ClInclude Include="libjpeg\jdmainct.h" />
+    <ClInclude Include="libjpeg\jdmaster.h" />
+    <ClInclude Include="libjpeg\jdmerge.h" />
+    <ClInclude Include="libjpeg\jdsample.h" />
+    <ClInclude Include="libjpeg\jerror.h" />
+    <ClInclude Include="libjpeg\jinclude.h" />
+    <ClInclude Include="libjpeg\jlossls.h" />
+    <ClInclude Include="libjpeg\jmemsys.h" />
+    <ClInclude Include="libjpeg\jmorecfg.h" />
+    <ClInclude Include="libjpeg\jpegapicomp.h" />
+    <ClInclude Include="libjpeg\jpegint.h" />
+    <ClInclude Include="libjpeg\jpeglib.h" />
+    <ClInclude Include="libjpeg\jpeg_nbits.h" />
+    <ClInclude Include="libjpeg\jsamplecomp.h" />
+    <ClInclude Include="libjpeg\jsimd.h" />
+    <ClInclude Include="libjpeg\jsimddct.h" />
+    <ClInclude Include="libjpeg\jversion.h" />
+    <ClInclude Include="libjpeg\tjutil.h" />
+    <ClInclude Include="libjpeg\transupp.h" />
+    <ClInclude Include="libjpeg\turbojpeg.h" />
     <ClInclude Include="MainWnd.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
