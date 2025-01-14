@@ -10,7 +10,6 @@
 
 CMainWnd::CMainWnd(void) noexcept
 {
-	ZeroMemory(currentPath, sizeof(currentPath));
 }
 
 CMainWnd::~CMainWnd(void)
@@ -79,8 +78,8 @@ LRESULT	CMainWnd::OnFileExplorerButtonClicked(WORD wNotifyCode, WORD wID, HWND h
 	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 	
 	if (GetOpenFileName(&ofn) == TRUE) {
-		memcpy(currentPath, ofn.lpstrFile, sizeof(currentPath));
-		m_ImgWnd.PostMessage(WM_USER_IMG_PATH, reinterpret_cast<WPARAM>(currentPath), 0);
+		memcpy(m_ImgWnd.currentPath, ofn.lpstrFile, min(sizeof(m_ImgWnd.currentPath), sizeof(filename)) );
+		m_ImgWnd.PostMessage(WM_USER_DRAW_IMAGE, 0, 0);
 	}
 		//MessageBox(ofn.lpstrFile, _T("Selected File"), MB_OK);
 

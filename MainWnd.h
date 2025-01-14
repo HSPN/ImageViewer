@@ -34,7 +34,6 @@ private:
 	LRESULT		OnDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) noexcept;
 	LRESULT		OnFileExplorerButtonClicked(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled) noexcept;
 
-	TCHAR currentPath[MAX_PATH+1];
 	CImgWnd m_ImgWnd;
 };
 
