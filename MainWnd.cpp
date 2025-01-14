@@ -38,11 +38,10 @@ BOOL CMainWnd::CreateMainWindow()
 
 LRESULT CMainWnd::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) noexcept
 {
-	HWND hFileOpenButton = CreateWindow(
-		_T("BUTTON"), _T("파일 열기"),
-		WS_TABSTOP | WS_VISIBLE | WS_CHILD,
-		10, 10, 100, 30,
-		m_hWnd, (HMENU)IDD_DIALOG1, _Module.GetModuleInstance(), NULL);
+	//첫인자는 현재 CMainWnd의 hInstance를 받음
+	//두번째인자는 매크로 정수를 어거지로 문자열포인터로 바꾸는데, 값 찍어보니까 L"IDR_MENU1"로 바뀌는것도 아님. 저 포인터를 직접 참조하진 않고, 그냥 내부 동작에서 오프셋값같은걸로 쓰는듯
+	auto hMenu = LoadMenu(_Module.GetModuleInstance(), MAKEINTRESOURCE(IDR_MENU1));
+	SetMenu(hMenu);
 	return 0;
 }
 
@@ -64,14 +63,15 @@ LRESULT	CMainWnd::OnFileExplorerButtonClicked(WORD wNotifyCode, WORD wID, HWND h
 	ofn.hwndOwner = m_hWnd;
 	ofn.lpstrFile = filename;
 	ofn.nMaxFile = sizeof(filename);
-	ofn.lpstrFilter = _T("*.jpg\0");
+	ofn.lpstrFilter = _T("jpg파일\0*.jpg\0"); //2쌍씩 작성해야함.. [설명\0패턴\0]
 	ofn.nFilterIndex = 1; //1개중에 첫번째..
-	//ofn.lpstrFileTitle = NULL; //경로대신 파일명?
+	
+	//ofn.lpstrFileTitle = NULL; //FileTitle은 경로 제외한 파일명. 나중에 파일명 제외한 폴더경로 구할때 쓰면 편할듯
 	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
 	if (GetOpenFileName(&ofn) == TRUE)
 		MessageBox(ofn.lpstrFile, _T("Selected File"), MB_OK);
-
+	
 	return 0;
 }
 

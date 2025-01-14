@@ -25,12 +25,13 @@ public :
 	BEGIN_MSG_MAP(CMainWnd)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
 		MESSAGE_HANDLER(WM_DESTROY, OnDestroy)
-		COMMAND_HANDLER(IDD_DIALOG1, BN_CLICKED, OnFileExplorerButtonClicked)
+		COMMAND_HANDLER(IDM_OPEN, BN_CLICKED, OnFileExplorerButtonClicked)
 	END_MSG_MAP()
 
 private:
 	LRESULT		OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) noexcept;
 	LRESULT		OnDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) noexcept;
 	LRESULT		OnFileExplorerButtonClicked(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled) noexcept;
+
 };
 
