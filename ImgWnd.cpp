@@ -71,12 +71,30 @@ LRESULT CImgWnd::ReadImage(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL
 	return 0;
 }
 
+using jpeg_error_mgr_jmp = struct {
+	jpeg_error_mgr pub;
+	jmp_buf jmp_buffer;
+};
+
 LRESULT CImgWnd::_ReadImage(FILE* fp)
 {
 	jpeg_decompress_struct cinfo;
-	jpeg_error_mgr jerr;
+	jpeg_error_mgr_jmp jerr;
+	
 
-	cinfo.err = jpeg_std_error(&jerr);
+	
+	cinfo.err = jpeg_std_error(&jerr.pub);
+
+	//libjpeg가 read중 오류가 나면, error_exit만 호출하고 예외없이 프로그램을 종료시킴
+	//jmp말고는 처리방법 없는듯
+	jerr.pub.error_exit = [](j_common_ptr cinfo) {
+		longjmp(reinterpret_cast<jpeg_error_mgr_jmp*>(cinfo->err)->jmp_buffer, 1);
+	};
+	if (setjmp(jerr.jmp_buffer)) {
+		MessageBox(_T("지원되지 않는 파일"), _T("Notification"), MB_OK);
+		return -1;
+	}
+
 	jpeg_create_decompress(&cinfo);
 	jpeg_stdio_src(&cinfo, fp);
 
@@ -120,6 +138,13 @@ LRESULT	CImgWnd::_WriteBitmap(jpeg_decompress_struct& cinfo)
 	void* ppvBits; //비트맵을 입력할 포인터
 	auto hdc = GetDC();
 	hBitmap = CreateDIBSection(hdc, &bitmapInfo, DIB_RGB_COLORS, &ppvBits, NULL, 0);
+	
+	if(setjmp(reinterpret_cast<jpeg_error_mgr_jmp*>(cinfo.err)->jmp_buffer)) {
+		if (imgData != nullptr) free(imgData);
+		ReleaseDC(hdc);
+		MessageBox(_T("지원되지 않는 파일"), _T("Notification"), MB_OK);
+		return -1;
+	}
 
 	auto cursor = reinterpret_cast<BYTE*>(ppvBits);
 	cursor += cinfo.output_height * size_imgData - 1; //세로 역순입력을 위해, 버퍼 끝에서 시작
