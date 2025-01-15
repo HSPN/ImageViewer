@@ -52,7 +52,8 @@ LRESULT CImgWnd::ReadImage(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL
 		return -1;
 	}
 	
-	_ReadImage(fp);
+	if (_ReadImage(fp) == 0)
+		RedrawWindow();
 	fclose(fp);
 	return 0;
 }

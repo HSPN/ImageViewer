@@ -74,6 +74,7 @@ LRESULT CMainWnd::OnResize(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lParam, BOOL
 	auto offsetWidth = max((width - bitmapInfo.bmiHeader.biWidth) / 2, 0);
 	auto offsetHeight = max((height - bitmapInfo.bmiHeader.biHeight) / 2, 0);
 	m_ImgWnd.MoveWindow(offsetWidth, offsetHeight, width, height);
+	m_ImgWnd.RedrawWindow();
 	return 0;
 }
 
