@@ -16,7 +16,7 @@ public:
 		MESSAGE_HANDLER(WM_PAINT, DrawImage)
 	END_MSG_MAP()
 
-	TCHAR currentPath[MAX_PATH + 1];
+	TCHAR currentPath[MAX_PATH];
 	const BITMAP GetBitmapInfo() const noexcept;
 
 private:

@@ -52,8 +52,6 @@ LRESULT CMainWnd::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, 
 
 LRESULT CMainWnd::OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {
-	if(m_ImgWnd.IsWindow())
-		m_ImgWnd.DestroyWindow();
 	PostQuitMessage(0);
 	return 0;
 }
@@ -112,8 +110,8 @@ LRESULT	CMainWnd::OnFileExplorerButtonClicked(WORD wNotifyCode, WORD wID, HWND h
 {
 	//프로그램들이 파일탐색기부분이 어쩐지 다 똑같이 생겼다 했더니, 윈도우에서 제공되는걸 쓰는거였음
 	auto ofn = OPENFILENAME();
-	TCHAR filename[MAX_PATH + 1] = { '\0' };	//_T부터 시작해서, T Alias들은 다 define에 따라 wchar쓸지 char쓸지 바꿔주는 역할
-	//TCHAR filepath[MAX_PATH + 1] = { '\0' };
+	TCHAR filename[MAX_PATH] = { '\0' };	//_T부터 시작해서, T Alias들은 다 define에 따라 wchar쓸지 char쓸지 바꿔주는 역할
+	//TCHAR filepath[MAX_PATH] = { '\0' };
 
 	ZeroMemory(&ofn, sizeof(OPENFILENAME)); //memset으로 0대입하는것과 동치
 	ofn.lStructSize = sizeof(OPENFILENAME);

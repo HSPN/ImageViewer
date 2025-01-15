@@ -63,7 +63,7 @@ LRESULT CImgWnd::ReadImage(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL
 		if (bitmapInfo.bmWidth > rect.right || bitmapInfo.bmHeight > rect.bottom)
 			parent.ResizeClient(widthNew, heightNew);
 		else //크기가 안변하면 WM_SIZE메시지가 전달이 안되서 직접 보냄
-			parent.PostMessageW(WM_SIZE, 0, MAKELPARAM(widthNew, heightNew));
+			parent.PostMessage(WM_SIZE, 0, MAKELPARAM(widthNew, heightNew));
 		
 	}
 	
@@ -81,17 +81,14 @@ LRESULT CImgWnd::_ReadImage(FILE* fp)
 	jpeg_decompress_struct cinfo;
 	jpeg_error_mgr_jmp jerr;
 	
-
-	
 	cinfo.err = jpeg_std_error(&jerr.pub);
-
-	//libjpeg가 read중 오류가 나면, error_exit만 호출하고 예외없이 프로그램을 종료시킴
-	//jmp말고는 처리방법 없는듯
+	//libjpeg는 읽는중에 오류나면 리턴되지않고 종료됨. 콜백으로 예외처리
 	jerr.pub.error_exit = [](j_common_ptr cinfo) {
 		longjmp(reinterpret_cast<jpeg_error_mgr_jmp*>(cinfo->err)->jmp_buffer, 1);
 	};
 	if (setjmp(jerr.jmp_buffer)) {
 		MessageBox(_T("지원되지 않는 파일"), _T("Notification"), MB_OK);
+		jpeg_destroy_decompress(&cinfo);
 		return -1;
 	}
 
@@ -138,6 +135,12 @@ LRESULT	CImgWnd::_WriteBitmap(jpeg_decompress_struct& cinfo)
 	void* ppvBits; //비트맵을 입력할 포인터
 	auto hdc = GetDC();
 	hBitmap = CreateDIBSection(hdc, &bitmapInfo, DIB_RGB_COLORS, &ppvBits, NULL, 0);
+	if (hBitmap == nullptr) {
+		MessageBox(_T("비트맵 생성 실패"), _T("Notification"), MB_OK);
+		free(imgData);
+		ReleaseDC(hdc);
+		return -1;
+	}
 	
 	if(setjmp(reinterpret_cast<jpeg_error_mgr_jmp*>(cinfo.err)->jmp_buffer)) {
 		if (imgData != nullptr) free(imgData);
