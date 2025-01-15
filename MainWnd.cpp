@@ -52,6 +52,12 @@ LRESULT CMainWnd::OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/,
 {
 	PostQuitMessage(0);
 	return 0;
+
+}
+LRESULT CMainWnd::OnPaint(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) noexcept
+{
+	m_ImgWnd.PostMessage(WM_PAINT, 0, 0);
+	return 0;
 }
 
 BOOL CMainWnd::PreTranslateMessage(MSG* /*pMsg*/) noexcept
@@ -79,7 +85,7 @@ LRESULT	CMainWnd::OnFileExplorerButtonClicked(WORD wNotifyCode, WORD wID, HWND h
 	
 	if (GetOpenFileName(&ofn) == TRUE) {
 		memcpy(m_ImgWnd.currentPath, ofn.lpstrFile, min(sizeof(m_ImgWnd.currentPath), sizeof(filename)) );
-		m_ImgWnd.PostMessage(WM_USER_DRAW_IMAGE, 0, 0);
+		m_ImgWnd.PostMessage(WM_USER_READ_IMAGE, 0, 0);
 	}
 		//MessageBox(ofn.lpstrFile, _T("Selected File"), MB_OK);
 

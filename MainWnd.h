@@ -26,12 +26,14 @@ public :
 	BEGIN_MSG_MAP(CMainWnd)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
 		MESSAGE_HANDLER(WM_DESTROY, OnDestroy)
+		MESSAGE_HANDLER(WM_PAINT, OnPaint)
 		COMMAND_HANDLER(IDM_OPEN, BN_CLICKED, OnFileExplorerButtonClicked)
 	END_MSG_MAP()
 
 private:
 	LRESULT		OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) noexcept;
 	LRESULT		OnDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) noexcept;
+	LRESULT		OnPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) noexcept;
 	LRESULT		OnFileExplorerButtonClicked(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled) noexcept;
 
 	CImgWnd m_ImgWnd;
