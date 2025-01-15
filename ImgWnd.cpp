@@ -6,18 +6,19 @@ LRESULT CImgWnd::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, B
 	//auto hImg = LoadBitmap(_Module.GetModuleInstance(), MAKEINTRESOURCE(IDB_BITMAP1));
 {
 	ZeroMemory(currentPath, sizeof(currentPath));
+	ZeroMemory(&bitmapInfo, sizeof(bitmapInfo));
 	ShowWindow(SW_SHOW);
 	return 0;
 }
 
-LRESULT CImgWnd::OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) noexcept
+LRESULT CImgWnd::OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {
 	DeleteObject(hBitmap);
 	PostQuitMessage(0);
 	return 0;
 }
 
-LRESULT CImgWnd::DrawImage(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& /*bHandled*/) noexcept
+LRESULT CImgWnd::DrawImage(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {
 	//MessageBox(_T("호출호출"), _T("Notification"), MB_OK);
 	PAINTSTRUCT ps;
@@ -38,7 +39,7 @@ LRESULT CImgWnd::DrawImage(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL
 	return 0;
 }
 
-LRESULT CImgWnd::ReadImage(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& /*bHandled*/) noexcept
+LRESULT CImgWnd::ReadImage(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {
 	//지금 코드전체에서 TCHAR를 쓰니 맞추기
 	//유니코드 빼보니, 빼게되면 수정할부분이 조금 있긴 함
@@ -76,7 +77,7 @@ LRESULT CImgWnd::ReadImage(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL
 	return 0;
 }
 
-LRESULT CImgWnd::_ReadImage(FILE* fp) noexcept
+LRESULT CImgWnd::_ReadImage(FILE* fp)
 {
 	jpeg_decompress_struct cinfo;
 	jpeg_error_mgr jerr;

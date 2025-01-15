@@ -44,7 +44,7 @@ BOOL CMainWnd::CreateMainWindow()
 	return TRUE;
 }
 
-LRESULT CMainWnd::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) noexcept
+LRESULT CMainWnd::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {
 	//첫인자는 현재 CMainWnd의 hInstance를 받음
 	//두번째인자는 매크로 정수를 어거지로 문자열포인터로 바꾸는데, 값 찍어보니까 L"IDR_MENU1"로 바뀌는것도 아님. 저 포인터를 직접 참조하진 않고, 그냥 내부 동작에서 오프셋값같은걸로 쓰는듯
@@ -56,7 +56,7 @@ LRESULT CMainWnd::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, 
 	return 0;
 }
 
-LRESULT CMainWnd::OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) noexcept
+LRESULT CMainWnd::OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {
 	if(m_ImgWnd.IsWindow())
 		m_ImgWnd.DestroyWindow();
@@ -75,10 +75,11 @@ LRESULT CMainWnd::OnResize(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lParam, BOOL
 	auto offsetHeight = max((height - bitmapInfo.bmiHeader.biHeight) / 2, 0);
 	m_ImgWnd.MoveWindow(offsetWidth, offsetHeight, width, height);
 	m_ImgWnd.RedrawWindow();
+	RedrawWindow();
 	return 0;
 }
 
-LRESULT CMainWnd::OnPaint(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lParam, BOOL& /*bHandled*/) noexcept
+LRESULT CMainWnd::OnPaint(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lParam, BOOL& /*bHandled*/)
 {
 	PAINTSTRUCT ps;  
 	auto hdc = BeginPaint(&ps); //GetDC대신 WM_PAINT안에서만 사용
@@ -104,6 +105,7 @@ LRESULT CMainWnd::OnPaint(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lParam, BOOL&
 	//return 0;
 	if(m_ImgWnd.IsWindow())
 		m_ImgWnd.PostMessage(WM_PAINT, 0, 0);
+
 	return 0;
 }
 
@@ -112,7 +114,7 @@ BOOL CMainWnd::PreTranslateMessage(MSG* /*pMsg*/) noexcept
 	return FALSE;
 }
 
-LRESULT	CMainWnd::OnFileExplorerButtonClicked(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled) noexcept
+LRESULT	CMainWnd::OnFileExplorerButtonClicked(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
 	//프로그램들이 파일탐색기부분이 어쩐지 다 똑같이 생겼다 했더니, 윈도우에서 제공되는걸 쓰는거였음
 	auto ofn = OPENFILENAME();
@@ -139,7 +141,7 @@ LRESULT	CMainWnd::OnFileExplorerButtonClicked(WORD wNotifyCode, WORD wID, HWND h
 	return 0;
 }
 
-LRESULT	CMainWnd::OnExitButtonClicked(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled) noexcept
+LRESULT	CMainWnd::OnExitButtonClicked(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
 {
 	DestroyWindow();
 	return 0;

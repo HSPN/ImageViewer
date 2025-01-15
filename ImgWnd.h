@@ -20,11 +20,11 @@ public:
 
 private:
 	LRESULT		OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) noexcept;
-	LRESULT		OnDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) noexcept;
-	LRESULT		ReadImage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) noexcept;
-	LRESULT		_ReadImage(FILE *fp) noexcept;
+	LRESULT		OnDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT		ReadImage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT		_ReadImage(FILE *fp);
 
-	LRESULT		DrawImage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) noexcept;
+	LRESULT		DrawImage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
 	BITMAPINFO bitmapInfo;
 	HBITMAP hBitmap;
