@@ -52,8 +52,26 @@ LRESULT CImgWnd::ReadImage(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL
 		return -1;
 	}
 	
-	if (_ReadImage(fp) == 0)
-		RedrawWindow();
+	if (_ReadImage(fp) == 0) {
+		//Parent의 윈도우사이즈가 이미지보다 작은경우, 강제로 키움. 가로세로 따로
+		auto parent = GetParent();
+		RECT rect;
+		parent.GetWindowRect(&rect);
+		
+		auto width = bitmapInfo.bmiHeader.biWidth;
+		auto height = bitmapInfo.bmiHeader.biHeight;
+		auto width_parent = rect.right - rect.left;
+		auto height_parent = rect.bottom - rect.top;
+		
+		if (width_parent < width || height_parent < height) {
+			rect.right = rect.left + max(width, width_parent);
+			rect.bottom = rect.top + max(height, height_parent);
+			parent.MoveWindow(&rect);
+		}
+		else
+			RedrawWindow();
+	}
+	
 	fclose(fp);
 	return 0;
 }
