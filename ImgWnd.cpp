@@ -39,6 +39,7 @@ LRESULT CImgWnd::DrawImage(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL
 LRESULT CImgWnd::ReadImage(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& /*bHandled*/) noexcept
 {
 	//지금 코드전체에서 TCHAR를 쓰니 맞추기
+	//유니코드 빼보니, 빼게되면 수정할부분이 조금 있긴 함
 #ifdef UNICODE
 	auto fp = _wfopen(currentPath, _T("rb"));
 #else
@@ -63,7 +64,7 @@ LRESULT CImgWnd::_ReadImage(FILE* fp) noexcept
 	jpeg_create_decompress(&cinfo);
 	jpeg_stdio_src(&cinfo, fp);
 
-	if (!jpeg_read_header(&cinfo, true)) {
+	if (!jpeg_read_header(&cinfo, true)) { //return 0 == SUSPENDED
 		MessageBox(_T("헤더가 손상된 파일"), _T("Notification"), MB_OK);
 		return -1;
 	}
@@ -110,32 +111,17 @@ LRESULT CImgWnd::_ReadImage(FILE* fp) noexcept
 	hBitmap = CreateDIBSection(hdc, &bitmapInfo, DIB_RGB_COLORS, &ppvBits, NULL, 0);
 	
 	auto cursor = reinterpret_cast<BYTE*>(ppvBits);
+	cursor += cinfo.output_height * cinfo.output_width * cinfo.output_components - 1; //역순입력
 	auto s_imgData = cinfo.image_width * cinfo.output_components;
-	JSAMPARRAY buffer = (*cinfo.mem->alloc_sarray)((j_common_ptr)&cinfo, JPOOL_IMAGE, s_imgData, 1);
+	
 	while (cinfo.output_scanline < cinfo.output_height) {
-		auto ret = jpeg_read_scanlines(&cinfo, buffer, 1);
-		if(ret == 0)
-			auto bb = 3;
-		if (cinfo.output_scanline == 1000)
-			auto a = 3;
-		memcpy(cursor, buffer[0], s_imgData);
-		auto& blue = cursor[0];
-		auto& green = cursor[1];
-		auto& red = cursor[2];
-		cursor += s_imgData;
+		auto ret = jpeg_read_scanlines(&cinfo, &imgData, 1);
+		//memcpy(cursor, imgData, s_imgData);
+		for (auto i = 0; i < s_imgData; i++)
+			cursor[-i] = imgData[i];
+		cursor -= s_imgData;
 	}
-	/*
-	memset(ppvBits, 0x00, cinfo.image_width * cinfo.image_height * 3);
-	// 빨간 직사각형 그리기 
-	int rectWidth = 1800; 
-	int rectHeight = 900; 
-	for (int y = 50; y < 50 + rectHeight; ++y) {
-		for (int x = 50; x < 50 + rectWidth; ++x) {
-			((BYTE*)ppvBits)[(y * 1920 + x) * 3 + 0] = 0x00; // Blue 
-			((BYTE*)ppvBits)[(y * 1920 + x) * 3 + 1] = 0x00; // Green 
-			((BYTE*)ppvBits)[(y * 1920 + x) * 3 + 2] = 0xFF; // Red 
-		}
-	}*/
+	
 	ReleaseDC(hdc);
 	DeleteDC(hMemDC);
 	free(imgData);
