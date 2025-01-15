@@ -11,7 +11,6 @@
 #define IDC_ACCEL                       109
 #define IDR_MAINFRAME                   128
 #define IDR_MENU1                       132
-#define IDB_BITMAP1                     134
 #define IDM_OPEN                        32773
 #define IDM_CLOSE                       32774
 

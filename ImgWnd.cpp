@@ -6,7 +6,6 @@ LRESULT CImgWnd::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, B
 	//auto hImg = LoadBitmap(_Module.GetModuleInstance(), MAKEINTRESOURCE(IDB_BITMAP1));
 {
 	ZeroMemory(currentPath, sizeof(currentPath));
-	ZeroMemory(&bitmapInfo, sizeof(bitmapInfo));
 	ShowWindow(SW_SHOW);
 	return 0;
 }
@@ -17,7 +16,7 @@ LRESULT CImgWnd::OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, 
 	PostQuitMessage(0);
 	return 0;
 }
-
+ 
 LRESULT CImgWnd::DrawImage(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {
 	//MessageBox(_T("호출호출"), _T("Notification"), MB_OK);
@@ -25,15 +24,14 @@ LRESULT CImgWnd::DrawImage(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL
 	auto hdc = BeginPaint(&ps); //GetDC대신 WM_PAINT안에서만 사용
 	auto hMemDC = CreateCompatibleDC(hdc);
 	auto old = SelectObject(hMemDC, hBitmap);
+	DeleteObject(old);
 
 	BITMAP bit;
-	
 	GetObject(hBitmap, sizeof(BITMAP), &bit);
 
-	BitBlt(hdc, 0, 0, bitmapInfo.bmiHeader.biWidth, bitmapInfo.bmiHeader.biHeight, hMemDC, 0, 0, SRCCOPY);
+	BitBlt(hdc, 0, 0,  bit.bmWidth, bit.bmHeight, hMemDC, 0, 0, SRCCOPY);
 
 	DeleteDC(hMemDC);
-	SelectObject(hMemDC, old);
 	EndPaint(&ps);
 
 	return 0;
@@ -54,23 +52,20 @@ LRESULT CImgWnd::ReadImage(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL
 	}
 	
 	if (_ReadImage(fp) == 0) {
-		//Parent의 윈도우사이즈가 이미지보다 작은경우, 강제로 키움. 가로세로 따로
+		//Parent의 클라이언트사이즈가 이미지보다 작은경우 강제로 키움
 		auto parent = GetParent();
 		RECT rect;
-		parent.GetWindowRect(&rect);
+		parent.GetClientRect(&rect);
 		
-		auto width = bitmapInfo.bmiHeader.biWidth;
-		auto height = bitmapInfo.bmiHeader.biHeight;
-		auto width_parent = rect.right - rect.left;
-		auto height_parent = rect.bottom - rect.top;
+		auto bitmapInfo = GetBitmapInfo();
+		auto widthNew = max(bitmapInfo.bmWidth, rect.right);
+		auto heightNew = max(bitmapInfo.bmHeight, rect.bottom);
+
+		if (bitmapInfo.bmWidth > rect.right || bitmapInfo.bmHeight > rect.bottom)
+			parent.ResizeClient(widthNew, heightNew);
+		else //크기가 안변하면 WM_SIZE메시지가 전달이 안되서 직접 보냄
+			parent.PostMessageW(WM_SIZE, 0, MAKELPARAM(widthNew, heightNew));
 		
-		if (width_parent < width || height_parent < height) {
-			rect.right = rect.left + max(width, width_parent);
-			rect.bottom = rect.top + max(height, height_parent);
-			parent.MoveWindow(&rect);
-		}
-		else
-			RedrawWindow();
 	}
 	
 	fclose(fp);
@@ -107,6 +102,7 @@ LRESULT CImgWnd::_ReadImage(FILE* fp)
 	
 
 	//cinfo -> BITMAPINFO로 값 매칭
+	BITMAPINFO bitmapInfo;
 	ZeroMemory(&bitmapInfo, sizeof(bitmapInfo));
 	bitmapInfo.bmiHeader.biSize = sizeof(bitmapInfo);
 	bitmapInfo.bmiHeader.biWidth = cinfo.output_width;
@@ -130,7 +126,6 @@ LRESULT CImgWnd::_ReadImage(FILE* fp)
 
 	void* ppvBits; //비트맵을 입력할 포인터
 	auto hdc = GetDC();
-	auto hMemDC = CreateCompatibleDC(hdc); //직접채우지않고 다른 DC에 적어놓고 교체
 	hBitmap = CreateDIBSection(hMemDC, &bitmapInfo, DIB_RGB_COLORS, &ppvBits, NULL, 0);
 
 	auto cursor = reinterpret_cast<BYTE*>(ppvBits);
@@ -144,20 +139,18 @@ LRESULT CImgWnd::_ReadImage(FILE* fp)
 				cursor[pixel+(size_color - color) - (int)size_imgData] = imgData[pixel + color];
 		cursor -= size_imgData;
 	}
-	
+	jpeg_finish_decompress(&cinfo);
+	jpeg_destroy_decompress(&cinfo);
 	ReleaseDC(hdc);
-	DeleteDC(hMemDC);
 	free(imgData);
-	//	BITMAPINFO bitmapInfo;
-	//jpeg_create_decompress
-	//	bitmapInfo.bmiHeader
-	//	CreateDIBSection(GetDC(), )
-	//	//MessageBox(currentPath, _T("Notification"), MB_OK);
-	//ReleaseDC(dc);
+	
 	return 0;
 }
 
-const BITMAPINFO CImgWnd::GetBitmapInfo() const noexcept
+const BITMAP CImgWnd::GetBitmapInfo() const noexcept
 {
+	BITMAP bitmapInfo;
+	if(!GetObject(hBitmap, sizeof(BITMAP), &bitmapInfo))
+		ZeroMemory(&bitmapInfo, sizeof(bitmapInfo));
 	return bitmapInfo;
 }

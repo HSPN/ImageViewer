@@ -29,17 +29,11 @@ BOOL CMainWnd::CreateMainWindow()
 	__super::Create(nullptr, &rWnd, APP_NAME, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS);
 	CenterWindow();
 	
-
 	// 보이기
 	ShowWindow(SW_SHOW);
-	DragAcceptFiles(TRUE);
 
-	CWndClassInfo& imgWinInfo = m_ImgWnd.GetWndClassInfo();
-	imgWinInfo.m_wc.lpszClassName = APP_CLASS_NAME;
-	imgWinInfo.m_wc.style = CS_DBLCLKS;
-	imgWinInfo.m_wc.hbrBackground = nullptr;
-	imgWinInfo.m_wc.hIcon = ::LoadIcon(_Module.m_hInst, MAKEINTRESOURCE(IDI_MAIN));
-	m_ImgWnd.Create(m_hWnd, &rWnd, _T("Image"), WS_CHILD);
+	rWnd.right = rWnd.bottom = 0;
+	m_ImgWnd.Create(m_hWnd, rWnd, _T("Image"), WS_CHILD);
 
 	return TRUE;
 }
@@ -71,41 +65,41 @@ LRESULT CMainWnd::OnResize(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lParam, BOOL
 	auto bitmapInfo = m_ImgWnd.GetBitmapInfo();
 	auto width = LOWORD(lParam);
 	auto height = HIWORD(lParam);
-	auto offsetWidth = max((width - bitmapInfo.bmiHeader.biWidth) / 2, 0);
-	auto offsetHeight = max((height - bitmapInfo.bmiHeader.biHeight) / 2, 0);
+	auto offsetWidth = max((width - bitmapInfo.bmWidth) / 2, 0);
+	auto offsetHeight = max((height - bitmapInfo.bmHeight) / 2, 0);
 	m_ImgWnd.MoveWindow(offsetWidth, offsetHeight, width, height);
 	m_ImgWnd.RedrawWindow();
-	RedrawWindow();
 	return 0;
 }
 
 LRESULT CMainWnd::OnPaint(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lParam, BOOL& /*bHandled*/)
 {
-	PAINTSTRUCT ps;  
-	auto hdc = BeginPaint(&ps); //GetDC대신 WM_PAINT안에서만 사용
-	auto hMemDC = CreateCompatibleDC(hdc);
-	auto hBitmap = CreateCompatibleBitmap(hdc, 0, 0);
-	auto old = SelectObject(hMemDC, hBitmap);
-
-	RECT rect;
-	GetWindowRect(&rect);
-	rect.right -= rect.left;
-	rect.left = 0;
-	rect.bottom -= rect.top;
-	rect.top = 0;
-
-	//Rectangle(hMemDC, 0, 0, rect.right, rect.bottom);
-	FillRect(hMemDC, &rect, (HBRUSH)(COLOR_WINDOW+1));
-	BitBlt(hdc, 0, 0, rect.right, rect.bottom, hMemDC, 0, 0, SRCCOPY);
-
-	DeleteDC(hMemDC);
-	SelectObject(hMemDC, old);
-	EndPaint(&ps);
-	DeleteObject(hBitmap);
-	//return 0;
 	if(m_ImgWnd.IsWindow())
 		m_ImgWnd.PostMessage(WM_PAINT, 0, 0);
 
+	return 0;
+}
+
+LRESULT	CMainWnd::OnErase(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+	PAINTSTRUCT ps;  
+	auto hdc = BeginPaint(&ps);
+	
+	RECT rc; 
+	GetClientRect(&rc);
+
+	auto hMemDC = CreateCompatibleDC(hdc);
+	auto hBitmap = CreateCompatibleBitmap(hdc, rc.right - rc.left, rc.bottom - rc.top);
+	
+	auto old = SelectObject(hMemDC, hBitmap); //널이 아닌값이 리턴되니 일단 Delete
+	DeleteObject(old);
+	
+	FillRect(hMemDC, &rc, (HBRUSH)(COLOR_WINDOW + 1));
+	BitBlt(hdc, 0, 0, rc.right - rc.left, rc.bottom - rc.top, hMemDC, 0, 0, SRCCOPY);
+	
+	EndPaint(&ps);
+	DeleteDC(hMemDC);
+	DeleteObject(hBitmap);
 	return 0;
 }
 

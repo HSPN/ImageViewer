@@ -16,7 +16,7 @@ public:
 	END_MSG_MAP()
 
 	TCHAR currentPath[MAX_PATH + 1];
-	const BITMAPINFO GetBitmapInfo() const noexcept;
+	const BITMAP GetBitmapInfo() const noexcept;
 
 private:
 	LRESULT		OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) noexcept;
@@ -26,7 +26,6 @@ private:
 
 	LRESULT		DrawImage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
-	BITMAPINFO bitmapInfo;
 	HBITMAP hBitmap;
 	HDC hdc, hMemDC;
 };
