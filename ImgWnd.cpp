@@ -1,5 +1,4 @@
 #include "ImgWnd.h"
-#include "libjpeg/jpeglib.h"
 #include <new>
 
 LRESULT CImgWnd::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) noexcept
@@ -92,16 +91,22 @@ LRESULT CImgWnd::_ReadImage(FILE* fp)
 		jpeg_destroy_decompress(&cinfo);
 		return -1;
 	}
+	auto ret = _WriteBitmap(cinfo);
+	jpeg_finish_decompress(&cinfo);
+	jpeg_destroy_decompress(&cinfo);
+	return ret;
+}
 
+
+LRESULT	CImgWnd::_WriteBitmap(jpeg_decompress_struct& cinfo)
+{
 	auto size_imgData = cinfo.output_width * cinfo.output_components;
 	auto imgData = (JSAMPLE *)malloc(size_imgData);// cinfo.jpeg_color_space);
 	if (imgData == nullptr) {
 		MessageBox(_T("메모리 부족"), _T("Notification"), MB_OK);
-		jpeg_destroy_decompress(&cinfo);
 		return -1;
 	}
 	
-
 	//cinfo -> BITMAPINFO로 값 매칭
 	BITMAPINFO bitmapInfo;
 	ZeroMemory(&bitmapInfo, sizeof(bitmapInfo));
@@ -114,21 +119,25 @@ LRESULT CImgWnd::_ReadImage(FILE* fp)
 
 	void* ppvBits; //비트맵을 입력할 포인터
 	auto hdc = GetDC();
-	hBitmap = CreateDIBSection(hMemDC, &bitmapInfo, DIB_RGB_COLORS, &ppvBits, NULL, 0);
+	hBitmap = CreateDIBSection(hdc, &bitmapInfo, DIB_RGB_COLORS, &ppvBits, NULL, 0);
 
 	auto cursor = reinterpret_cast<BYTE*>(ppvBits);
 	cursor += cinfo.output_height * size_imgData - 1; //세로 역순입력을 위해, 버퍼 끝에서 시작
 	
 	while (cinfo.output_scanline < cinfo.output_height) {
 		auto ret = jpeg_read_scanlines(&cinfo, &imgData, 1);
+		if (ret < 1) {
+			MessageBox(_T("손상된 파일"), _T("Notification"), MB_OK);
+			ReleaseDC(hdc);
+			free(imgData);
+			return -1;
+		}
 		auto& size_color = cinfo.output_components;
 		for (int pixel = 0; pixel < size_imgData; pixel+=size_color) //세로는 역순입력, 가로는 같은순서입력, 픽셀 내 색상은 역순입력해야 똑바로나옴
 			for (int color = 0; color < size_color; color++)
 				cursor[pixel+(size_color - color) - (int)size_imgData] = imgData[pixel + color];
 		cursor -= size_imgData;
 	}
-	jpeg_finish_decompress(&cinfo);
-	jpeg_destroy_decompress(&cinfo);
 	ReleaseDC(hdc);
 	free(imgData);
 	

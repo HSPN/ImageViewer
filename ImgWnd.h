@@ -2,6 +2,7 @@
 
 #include "stdafx.h"
 #include "resource.h"
+#include "libjpeg/jpeglib.h"
 
 #define WM_USER_READ_IMAGE (WM_USER + 1)
 
@@ -22,10 +23,10 @@ private:
 	LRESULT		OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) noexcept;
 	LRESULT		OnDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT		ReadImage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	LRESULT		_ReadImage(FILE *fp);
+	LRESULT		_WriteBitmap(jpeg_decompress_struct &cinfo);
+	LRESULT		_ReadImage(FILE* fp);
 
 	LRESULT		DrawImage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
 	HBITMAP hBitmap;
-	HDC hdc, hMemDC;
 };
