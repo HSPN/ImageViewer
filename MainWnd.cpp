@@ -26,14 +26,20 @@ BOOL CMainWnd::CreateMainWindow()
 	winInfo.m_wc.hIcon = ::LoadIcon(_Module.m_hInst, MAKEINTRESOURCE(IDI_MAIN));
 	CRect rWnd(0, 0, 640, 480);
 
-	__super::Create(nullptr, &rWnd,  APP_NAME, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS);
+	__super::Create(nullptr, &rWnd, APP_NAME, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS);
 	CenterWindow();
+	
 
 	// 보이기
 	ShowWindow(SW_SHOW);
 	DragAcceptFiles(TRUE);
 
-	m_ImgWnd.Create(m_hWnd, &rWnd, _T("Image"), WS_CHILD | WS_THICKFRAME);
+	CWndClassInfo& imgWinInfo = m_ImgWnd.GetWndClassInfo();
+	imgWinInfo.m_wc.lpszClassName = APP_CLASS_NAME;
+	imgWinInfo.m_wc.style = CS_DBLCLKS;
+	imgWinInfo.m_wc.hbrBackground = nullptr;
+	imgWinInfo.m_wc.hIcon = ::LoadIcon(_Module.m_hInst, MAKEINTRESOURCE(IDI_MAIN));
+	m_ImgWnd.Create(m_hWnd, &rWnd, _T("Image"), WS_CHILD);
 
 	return TRUE;
 }
@@ -45,20 +51,23 @@ LRESULT CMainWnd::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, 
 	auto hMenu = LoadMenu(_Module.GetModuleInstance(), MAKEINTRESOURCE(IDR_MENU1));
 	SetMenu(hMenu);
 
-	m_ImgWnd.Create(m_hWnd, CWindow::rcDefault, _T("Bitmap"));
-	m_ImgWnd.ShowWindow(SW_SHOWNORMAL);
+	//m_ImgWnd.Create(m_hWnd, CWindow::rcDefault, _T("Bitmap"));
+	//m_ImgWnd.ShowWindow(SW_SHOWNORMAL);
 	return 0;
 }
 
 LRESULT CMainWnd::OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) noexcept
 {
-	m_ImgWnd.DestroyWindow();
+	if(m_ImgWnd.IsWindow())
+		m_ImgWnd.DestroyWindow();
 	PostQuitMessage(0);
 	return 0;
 }
 
 LRESULT CMainWnd::OnResize(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lParam, BOOL& /*bHandled*/) noexcept
 {
+	if (!m_ImgWnd.IsWindow()) return 0;
+
 	auto bitmapInfo = m_ImgWnd.GetBitmapInfo();
 	auto width = LOWORD(lParam);
 	auto height = HIWORD(lParam);
@@ -68,9 +77,32 @@ LRESULT CMainWnd::OnResize(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lParam, BOOL
 	return 0;
 }
 
-LRESULT CMainWnd::OnPaint(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) noexcept
+LRESULT CMainWnd::OnPaint(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lParam, BOOL& /*bHandled*/) noexcept
 {
-	m_ImgWnd.PostMessage(WM_PAINT, 0, 0);
+	PAINTSTRUCT ps;  
+	auto hdc = BeginPaint(&ps); //GetDC대신 WM_PAINT안에서만 사용
+	auto hMemDC = CreateCompatibleDC(hdc);
+	auto hBitmap = CreateCompatibleBitmap(hdc, 0, 0);
+	auto old = SelectObject(hMemDC, hBitmap);
+
+	RECT rect;
+	GetWindowRect(&rect);
+	rect.right -= rect.left;
+	rect.left = 0;
+	rect.bottom -= rect.top;
+	rect.top = 0;
+
+	//Rectangle(hMemDC, 0, 0, rect.right, rect.bottom);
+	FillRect(hMemDC, &rect, (HBRUSH)(COLOR_WINDOW+1));
+	BitBlt(hdc, 0, 0, rect.right, rect.bottom, hMemDC, 0, 0, SRCCOPY);
+
+	DeleteDC(hMemDC);
+	SelectObject(hMemDC, old);
+	EndPaint(&ps);
+	DeleteObject(hBitmap);
+	//return 0;
+	if(m_ImgWnd.IsWindow())
+		m_ImgWnd.PostMessage(WM_PAINT, 0, 0);
 	return 0;
 }
 
