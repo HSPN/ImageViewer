@@ -85,6 +85,7 @@ LRESULT CImgWnd::_ReadImage(FILE* fp)
 		MessageBox(_T("헤더가 손상된 파일"), _T("Notification"), MB_OK);
 		return -1;
 	}
+	cinfo.out_color_space = JCS_RGB; //RGB 고정
 
 	if (!jpeg_start_decompress(&cinfo)) {
 		MessageBox(_T("디코딩 실패"), _T("Notification"), MB_OK);
@@ -110,19 +111,6 @@ LRESULT CImgWnd::_ReadImage(FILE* fp)
 	bitmapInfo.bmiHeader.biPlanes = 1;
 	bitmapInfo.bmiHeader.biBitCount = cinfo.output_components * cinfo.data_precision;	//컴포넌트 개수 * 컴포넌트당 비트수. 예를들어 RGB * 8비트면 24비트이미지
 	bitmapInfo.bmiHeader.biCompression = BI_RGB;
-	//bitmapInfo.bmiHeader.biSizeImage = 5760*1080;
-	bitmapInfo.bmiHeader.biYPelsPerMeter = 1;
-	bitmapInfo.bmiHeader.biXPelsPerMeter = 1;
-	
-	
-	//컬러스페이스 종류가 꽤 많음. 일단 평범한 예시에서만 확인하고 다른타입은 따로 추가
-	//종류별로 파일부터 다 구해야 테스트가 가능
-	//switch (cinfo.out_color_space) {
-	//case JCS_RGB :
-		
-	//}
-
-	//bitmapInfo.bmiColors
 
 	void* ppvBits; //비트맵을 입력할 포인터
 	auto hdc = GetDC();
