@@ -75,8 +75,8 @@ LRESULT CImgWnd::_ReadImage(FILE* fp) noexcept
 		return -1;
 	}
 
-	auto s_imgData = cinfo.output_width * cinfo.output_components;
-	auto imgData = (JSAMPLE *)malloc(s_imgData);// cinfo.jpeg_color_space);
+	auto size_imgData = cinfo.output_width * cinfo.output_components;
+	auto imgData = (JSAMPLE *)malloc(size_imgData);// cinfo.jpeg_color_space);
 	if (imgData == nullptr) {
 		MessageBox(_T("메모리 부족"), _T("Notification"), MB_OK);
 		jpeg_destroy_decompress(&cinfo);
@@ -87,8 +87,8 @@ LRESULT CImgWnd::_ReadImage(FILE* fp) noexcept
 	//cinfo -> BITMAPINFO로 값 매칭
 	ZeroMemory(&bitmapInfo, sizeof(bitmapInfo));
 	bitmapInfo.bmiHeader.biSize = sizeof(bitmapInfo);
-	bitmapInfo.bmiHeader.biWidth = cinfo.image_width;
-	bitmapInfo.bmiHeader.biHeight = cinfo.image_height;
+	bitmapInfo.bmiHeader.biWidth = cinfo.output_width;
+	bitmapInfo.bmiHeader.biHeight = cinfo.output_height;
 	bitmapInfo.bmiHeader.biPlanes = 1;
 	bitmapInfo.bmiHeader.biBitCount = cinfo.output_components * cinfo.data_precision;	//컴포넌트 개수 * 컴포넌트당 비트수. 예를들어 RGB * 8비트면 24비트이미지
 	bitmapInfo.bmiHeader.biCompression = BI_RGB;
@@ -112,15 +112,15 @@ LRESULT CImgWnd::_ReadImage(FILE* fp) noexcept
 	hBitmap = CreateDIBSection(hdc, &bitmapInfo, DIB_RGB_COLORS, &ppvBits, NULL, 0);
 
 	auto cursor = reinterpret_cast<BYTE*>(ppvBits);
-	cursor += cinfo.output_height * s_imgData - 1; //역순입력을 위해, 버퍼 끝에서 시작
+	cursor += cinfo.output_height * size_imgData - 1; //세로 역순입력을 위해, 버퍼 끝에서 시작
 	
 	while (cinfo.output_scanline < cinfo.output_height) {
 		auto ret = jpeg_read_scanlines(&cinfo, &imgData, 1);
-		for (int i = 0; i < s_imgData; i+=cinfo.output_components) //세로는 역순입력, 가로는 같은순서입력, 픽셀 내 색상은 역순입력
-			for (int j = 0; j < cinfo.output_components; j++)
-				cursor[i+(cinfo.output_components - j) - (int)s_imgData] = imgData[i + j];
-
-		cursor -= s_imgData;
+		auto& size_color = cinfo.output_components;
+		for (int pixel = 0; pixel < size_imgData; pixel+=size_color) //세로는 역순입력, 가로는 같은순서입력, 픽셀 내 색상은 역순입력해야 똑바로나옴
+			for (int color = 0; color < size_color; color++)
+				cursor[pixel+(size_color - color) - (int)size_imgData] = imgData[pixel + color];
+		cursor -= size_imgData;
 	}
 	
 	ReleaseDC(hdc);
