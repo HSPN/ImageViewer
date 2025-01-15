@@ -50,9 +50,9 @@ LRESULT CMainWnd::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, 
 
 LRESULT CMainWnd::OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) noexcept
 {
+	m_ImgWnd.DestroyWindow();
 	PostQuitMessage(0);
 	return 0;
-
 }
 LRESULT CMainWnd::OnPaint(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) noexcept
 {
@@ -82,12 +82,18 @@ LRESULT	CMainWnd::OnFileExplorerButtonClicked(WORD wNotifyCode, WORD wID, HWND h
 
 	//ofn.lpstrFileTitle = NULL; //FileTitle은 경로 제외한 파일명. 나중에 파일명 제외한 폴더경로 구할때 쓰면 편할듯
 	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
-	
+
 	if (GetOpenFileName(&ofn) == TRUE) {
-		memcpy(m_ImgWnd.currentPath, ofn.lpstrFile, min(sizeof(m_ImgWnd.currentPath), sizeof(filename)) );
+		memcpy(m_ImgWnd.currentPath, ofn.lpstrFile, min(sizeof(m_ImgWnd.currentPath), sizeof(filename)));
 		m_ImgWnd.PostMessage(WM_USER_READ_IMAGE, 0, 0);
 	}
-		//MessageBox(ofn.lpstrFile, _T("Selected File"), MB_OK);
+	//MessageBox(ofn.lpstrFile, _T("Selected File"), MB_OK);
 
+	return 0;
+}
+
+LRESULT	CMainWnd::OnExitButtonClicked(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled) noexcept
+{
+	DestroyWindow();
 	return 0;
 }

@@ -12,6 +12,7 @@ LRESULT CImgWnd::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, B
 
 LRESULT CImgWnd::OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) noexcept
 {
+	DeleteObject(hBitmap);
 	PostQuitMessage(0);
 	return 0;
 }
