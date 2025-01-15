@@ -21,17 +21,18 @@ LRESULT CImgWnd::DrawImage(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL
 {
 	//MessageBox(_T("호출호출"), _T("Notification"), MB_OK);
 	PAINTSTRUCT ps;
-	auto hdc = GetParent().BeginPaint(&ps);
+	auto hdc = BeginPaint(&ps); //GetDC대신 WM_PAINT안에서만 사용
 	auto hMemDC = CreateCompatibleDC(hdc);
-	SelectObject(hMemDC, hBitmap);
+	auto old = SelectObject(hMemDC, hBitmap);
 
 	BITMAP bit;
-
+	
 	GetObject(hBitmap, sizeof(BITMAP), &bit);
 
 	BitBlt(hdc, 0, 0, bitmapInfo.bmiHeader.biWidth, bitmapInfo.bmiHeader.biHeight, hMemDC, 0, 0, SRCCOPY);
 
 	DeleteDC(hMemDC);
+	SelectObject(hMemDC, old);
 	EndPaint(&ps);
 
 	return 0;
@@ -110,7 +111,7 @@ LRESULT CImgWnd::_ReadImage(FILE* fp) noexcept
 	void* ppvBits; //비트맵을 입력할 포인터
 	auto hdc = GetDC();
 	auto hMemDC = CreateCompatibleDC(hdc); //직접채우지않고 다른 DC에 적어놓고 교체
-	hBitmap = CreateDIBSection(hdc, &bitmapInfo, DIB_RGB_COLORS, &ppvBits, NULL, 0);
+	hBitmap = CreateDIBSection(hMemDC, &bitmapInfo, DIB_RGB_COLORS, &ppvBits, NULL, 0);
 
 	auto cursor = reinterpret_cast<BYTE*>(ppvBits);
 	cursor += cinfo.output_height * size_imgData - 1; //세로 역순입력을 위해, 버퍼 끝에서 시작
@@ -134,4 +135,9 @@ LRESULT CImgWnd::_ReadImage(FILE* fp) noexcept
 	//	//MessageBox(currentPath, _T("Notification"), MB_OK);
 	//ReleaseDC(dc);
 	return 0;
+}
+
+const BITMAPINFO CImgWnd::GetBitmapInfo() const noexcept
+{
+	return bitmapInfo;
 }

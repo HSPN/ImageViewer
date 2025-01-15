@@ -33,6 +33,8 @@ BOOL CMainWnd::CreateMainWindow()
 	ShowWindow(SW_SHOW);
 	DragAcceptFiles(TRUE);
 
+	m_ImgWnd.Create(m_hWnd, &rWnd, _T("Image"), WS_CHILD | WS_THICKFRAME);
+
 	return TRUE;
 }
 
@@ -54,6 +56,18 @@ LRESULT CMainWnd::OnDestroy(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/,
 	PostQuitMessage(0);
 	return 0;
 }
+
+LRESULT CMainWnd::OnResize(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lParam, BOOL& /*bHandled*/) noexcept
+{
+	auto bitmapInfo = m_ImgWnd.GetBitmapInfo();
+	auto width = LOWORD(lParam);
+	auto height = HIWORD(lParam);
+	auto offsetWidth = max((width - bitmapInfo.bmiHeader.biWidth) / 2, 0);
+	auto offsetHeight = max((height - bitmapInfo.bmiHeader.biHeight) / 2, 0);
+	m_ImgWnd.MoveWindow(offsetWidth, offsetHeight, width, height);
+	return 0;
+}
+
 LRESULT CMainWnd::OnPaint(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) noexcept
 {
 	m_ImgWnd.PostMessage(WM_PAINT, 0, 0);
