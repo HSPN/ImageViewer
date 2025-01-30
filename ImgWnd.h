@@ -2,7 +2,7 @@
 
 #include "stdafx.h"
 #include "resource.h"
-#include "libjpeg/jpeglib.h"
+#include "jpeglib.h"
 
 #define WM_USER_READ_IMAGE (WM_USER + 1)
 
